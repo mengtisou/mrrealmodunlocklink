@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watch YouTube Video to Unlock</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    iframe {
+      width: 100%;
+      height: 315px;
+      margin-bottom: 20px;
+    }
+
+    #unlockButton {
+      display: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    #unlockButton:hover {
+      background-color: #0056b3;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 16px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Watch the Video to Unlock the Link</h1>
+    <p>You need to watch at least 2 minutes of the video below to unlock the link.</p>
+
+    <!-- YouTube Video Embed -->
+    <div id="videoContainer">
+      <iframe id="youtubeVideo" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <!-- Hidden Unlock Button -->
+    <a id="unlockButton" href="https://your-custom-link.com" target="_blank">Go to the Link</a>
+
+    <!-- Message -->
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // YouTube API Script Load
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    let player;
+    let watchedTime = 0;
+    const requiredWatchTime = 120; // 2 minutes in seconds
+    let unlockButton = document.getElementById('unlockButton');
+    let message = document.getElementById('message');
+    let iframe = document.getElementById('youtubeVideo');
+
+    // Parse YouTube Video ID from URL Query Parameter
+    //Channel UCPglGxl2h81to5-0yMIyVgg
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get('video');
+
+    if (videoId) {
+      iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+    } else {
+      message.innerText = "Error: No video ID provided in the URL.";
+    }
+
+    // Initialize YouTube Player
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('youtubeVideo', {
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    // Track Video Watch Time
+    function onPlayerStateChange(event) {
+      if (event.data == YT.PlayerState.PLAYING) {
+        startTracking();
+      } else {
+        stopTracking();
+      }
+    }
+
+    let trackingInterval;
+
+    function startTracking() {
+      trackingInterval = setInterval(() => {
+        watchedTime = player.getCurrentTime();
+        if (watchedTime >= requiredWatchTime) {
+          clearInterval(trackingInterval);
+          unlockButton.style.display = 'inline-block';
+          message.innerText = "You've watched enough! The link is now unlocked.";
+        }
+      }, 1000); // Check every second
+    }
+
+    function stopTracking() {
+      clearInterval(trackingInterval);
+    }
+  </script>
+</body>
+</html>
