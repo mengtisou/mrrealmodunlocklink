@@ -63,7 +63,7 @@
   </div>
 
   <script>
-    // YouTube API Script Load
+    // Add YouTube IFrame API Script Dynamically
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -72,12 +72,11 @@
     let player;
     let watchedTime = 0;
     const requiredWatchTime = 120; // 2 minutes in seconds
-    let unlockButton = document.getElementById('unlockButton');
-    let message = document.getElementById('message');
-    let iframe = document.getElementById('youtubeVideo');
+    const unlockButton = document.getElementById('unlockButton');
+    const message = document.getElementById('message');
+    const iframe = document.getElementById('youtubeVideo');
 
     // Parse YouTube Video ID from URL Query Parameter
-    //Channel UCPglGxl2h81to5-0yMIyVgg
     const urlParams = new URLSearchParams(window.location.search);
     const videoId = urlParams.get('video');
 
@@ -96,20 +95,23 @@
       });
     }
 
-    // Track Video Watch Time
+    // Handle Video State Changes
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.PLAYING) {
         startTracking();
-      } else {
+      } else if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.ENDED) {
         stopTracking();
       }
     }
 
+    // Track Video Watch Time
     let trackingInterval;
 
     function startTracking() {
       trackingInterval = setInterval(() => {
-        watchedTime = player.getCurrentTime();
+        const currentTime = player.getCurrentTime(); // Get current playback time
+        watchedTime = Math.max(watchedTime, currentTime); // Track the max watched time
+
         if (watchedTime >= requiredWatchTime) {
           clearInterval(trackingInterval);
           unlockButton.style.display = 'inline-block';
