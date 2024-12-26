@@ -44,6 +44,7 @@
       color: green;
     }
   </style>
+  <link rel="icon" href="https://yt3.googleusercontent.com/UqDtvErvPwTZxriSb6uPChD1TKqMIz9RWfj0iFHAQUtF9EYc8DIIX7Lghg3lJyqoiqIdSHOSxw=s160-c-k-c0x00ffffff-no-rj" type="image/png">
 </head>
 <body>
   <div class="container">
@@ -56,7 +57,7 @@
     </div>
 
     <!-- Hidden Unlock Button -->
-    <a id="unlockButton" href="https://your-custom-link.com" target="_blank">Go to the Link</a>
+    <a id="unlockButton" href="#" target="_blank">Get Password</a>
 
     <!-- Message -->
     <div id="message"></div>
@@ -70,20 +71,28 @@
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     let player;
-    let watchedTime = 0;
+    let accumulatedWatchTime = 0; // Track the actual watch time
     const requiredWatchTime = 120; // 2 minutes in seconds
     const unlockButton = document.getElementById('unlockButton');
     const message = document.getElementById('message');
     const iframe = document.getElementById('youtubeVideo');
 
-    // Parse YouTube Video ID from URL Query Parameter
+    // Parse URL Parameters
     const urlParams = new URLSearchParams(window.location.search);
     const videoId = urlParams.get('video');
+    const unlockLink = urlParams.get('text');
 
+    // Set YouTube video and unlock link
     if (videoId) {
       iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
     } else {
       message.innerText = "Error: No video ID provided in the URL.";
+    }
+
+    if (unlockLink) {
+      unlockButton.href = `https://controlc.com/${unlockLink}`;
+    } else {
+      message.innerText = "Error: No unlock link provided in the URL.";
     }
 
     // Initialize YouTube Player
@@ -96,6 +105,8 @@
     }
 
     // Handle Video State Changes
+    let trackingInterval;
+
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.PLAYING) {
         startTracking();
@@ -105,14 +116,22 @@
     }
 
     // Track Video Watch Time
-    let trackingInterval;
-
     function startTracking() {
       trackingInterval = setInterval(() => {
         const currentTime = player.getCurrentTime(); // Get current playback time
-        watchedTime = Math.max(watchedTime, currentTime); // Track the max watched time
+        const videoDuration = player.getDuration();
 
-        if (watchedTime >= requiredWatchTime) {
+        // Prevent skipping: Reset watch time if user skips backward
+        if (currentTime < accumulatedWatchTime) {
+          accumulatedWatchTime = 0;
+          message.innerText = "No skipping! Please watch continuously.";
+        }
+
+        // Accumulate watch time
+        accumulatedWatchTime += 1; // Increment by 1 second every interval
+
+        // Unlock button if watch time is sufficient
+        if (accumulatedWatchTime >= requiredWatchTime) {
           clearInterval(trackingInterval);
           unlockButton.style.display = 'inline-block';
           message.innerText = "You've watched enough! The link is now unlocked.";
