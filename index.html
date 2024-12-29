@@ -49,7 +49,7 @@
 <body>
   <div class="container">
     <h1>Watch the Video to Unlock the Link</h1>
-    <p>You need to watch at least 2 minutes of the video below to unlock the link.</p>
+    <p>You need to watch at least 3 minutes of the video below to unlock the link.</p>
 
     <!-- YouTube Video Embed -->
     <div id="videoContainer">
@@ -72,7 +72,9 @@
 
     let player;
     let accumulatedWatchTime = 0; // Track the actual watch time
-    const requiredWatchTime = 120; // 2 minutes in seconds
+    //const requiredWatchTime = 120; // 2 minutes in seconds
+    const requiredWatchTime = 180; // 2 minutes in seconds    
+
     const unlockButton = document.getElementById('unlockButton');
     const message = document.getElementById('message');
     const iframe = document.getElementById('youtubeVideo');
