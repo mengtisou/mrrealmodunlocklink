@@ -43,6 +43,11 @@
       font-size: 16px;
       color: green;
     }
+
+    #timeDisplay {
+      font-size: 14px;
+      color: gray;
+    }
   </style>
   <link rel="icon" href="https://yt3.googleusercontent.com/UqDtvErvPwTZxriSb6uPChD1TKqMIz9RWfj0iFHAQUtF9EYc8DIIX7Lghg3lJyqoiqIdSHOSxw=s160-c-k-c0x00ffffff-no-rj" type="image/png">
 </head>
@@ -61,6 +66,7 @@
 
     <!-- Message -->
     <div id="message"></div>
+    <div id="timeDisplay">Time Watched: 0:00 / 3:00</div>
   </div>
 
   <script>
@@ -72,11 +78,11 @@
 
     let player;
     let accumulatedWatchTime = 0; // Track the actual watch time
-    //const requiredWatchTime = 120; // 2 minutes in seconds
-    const requiredWatchTime = 180; // 2 minutes in seconds    
-
+    let lastCheckedTime = 0;
+    const requiredWatchTime = 180; // 3 minutes in seconds
     const unlockButton = document.getElementById('unlockButton');
     const message = document.getElementById('message');
+    const timeDisplay = document.getElementById('timeDisplay');
     const iframe = document.getElementById('youtubeVideo');
 
     // Parse URL Parameters
@@ -120,29 +126,36 @@
     // Track Video Watch Time
     function startTracking() {
       trackingInterval = setInterval(() => {
-        const currentTime = player.getCurrentTime(); // Get current playback time
-        const videoDuration = player.getDuration();
+        if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+          const currentTime = player.getCurrentTime();
 
-        // Prevent skipping: Reset watch time if user skips backward
-        if (currentTime < accumulatedWatchTime) {
-          accumulatedWatchTime = 0;
-          message.innerText = "No skipping! Please watch continuously.";
+          if (currentTime > lastCheckedTime) {
+            accumulatedWatchTime += currentTime - lastCheckedTime;
+            lastCheckedTime = currentTime;
+            updateProgress();
+
+            if (accumulatedWatchTime >= requiredWatchTime) {
+              clearInterval(trackingInterval);
+              unlockButton.style.display = 'inline-block';
+              message.innerText = "You've watched enough! The link is now unlocked.";
+            }
+          }
         }
-
-        // Accumulate watch time
-        accumulatedWatchTime += 1; // Increment by 1 second every interval
-
-        // Unlock button if watch time is sufficient
-        if (accumulatedWatchTime >= requiredWatchTime) {
-          clearInterval(trackingInterval);
-          unlockButton.style.display = 'inline-block';
-          message.innerText = "You've watched enough! The link is now unlocked.";
-        }
-      }, 1000); // Check every second
+      }, 1000);
     }
 
     function stopTracking() {
       clearInterval(trackingInterval);
+    }
+
+    // Update Progress
+    function updateProgress() {
+      const minutesWatched = Math.floor(accumulatedWatchTime / 60);
+      const secondsWatched = Math.floor(accumulatedWatchTime % 60);
+      const totalMinutes = Math.floor(requiredWatchTime / 60);
+      const totalSeconds = requiredWatchTime % 60;
+
+      timeDisplay.innerText = `Time Watched: ${minutesWatched}:${secondsWatched < 10 ? '0' : ''}${secondsWatched} / ${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
     }
   </script>
 </body>
