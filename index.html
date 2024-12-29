@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Watch Video to Unlock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Roboto', Arial, sans-serif;
+      font-family: 'Poppins', Arial, sans-serif;
       text-align: center;
-      background-color: #f9f9f9;
+      background-color: #f0f4f8;
       margin: 0;
       padding: 0;
     }
@@ -16,22 +17,23 @@
     .container {
       max-width: 600px;
       margin: 40px auto;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      background: linear-gradient(145deg, #ffffff, #f9f9f9);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px 30px;
     }
 
     h1 {
-      font-size: 24px;
+      font-size: 26px;
       color: #333;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      font-weight: 600;
     }
 
     p {
       font-size: 16px;
-      color: #666;
-      margin-bottom: 20px;
+      color: #555;
+      margin-bottom: 25px;
     }
 
     iframe {
@@ -43,36 +45,83 @@
     }
 
     #progressContainer {
+      position: relative;
       background: #e0e0e0;
-      border-radius: 10px;
+      border-radius: 15px;
       overflow: hidden;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     #progressBar {
-      height: 10px;
+      height: 15px;
       width: 0%;
-      background: #4caf50;
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
       transition: width 0.3s ease-in-out;
+    }
+
+    #progressLabel {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .subscription-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .subscription-buttons a {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 25px;
+      transition: background 0.3s ease-in-out, transform 0.2s;
+    }
+
+    .subscription-buttons a.youtube {
+      background: #FF0000;
+    }
+
+    .subscription-buttons a.facebook {
+      background: #3b5998;
+    }
+
+    .subscription-buttons a.telegram {
+      background: #0088cc;
+    }
+
+    .subscription-buttons a:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
     }
 
     #unlockButton {
       display: none;
-      padding: 12px 24px;
+      padding: 14px 30px;
       font-size: 16px;
       font-weight: bold;
       color: #fff;
-      background-color: #007BFF;
+      background: linear-gradient(90deg, #007BFF, #0056b3);
       border: none;
-      border-radius: 5px;
+      border-radius: 25px;
       cursor: pointer;
       text-decoration: none;
       margin-top: 20px;
-      transition: background-color 0.3s ease-in-out;
+      transition: background 0.3s ease-in-out, transform 0.2s;
     }
 
     #unlockButton:hover {
-      background-color: #0056b3;
+      background: linear-gradient(90deg, #0056b3, #003e88);
+      transform: scale(1.05);
     }
 
     #message {
@@ -85,12 +134,36 @@
       font-size: 14px;
       color: #666;
     }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      .subscription-buttons a {
+        font-size: 12px;
+        padding: 8px 15px;
+      }
+
+      #unlockButton {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Watch the Video to Unlock the Link</h1>
-    <p>You need to watch at least 3 minutes of the video below to unlock the link.</p>
+    <h1>🎥 Watch the Video to Unlock the Link 🔓</h1>
+    <p>To access the link, you need to watch at least 3 minutes of the video below.</p>
 
     <!-- YouTube Video Embed -->
     <div id="videoContainer">
@@ -100,12 +173,20 @@
     <!-- Progress Bar -->
     <div id="progressContainer">
       <div id="progressBar"></div>
+      <span id="progressLabel">0%</span>
     </div>
 
-    <div id="timeDisplay">Time Watched: 0:00 / 3:00</div>
+    <div id="timeDisplay">⏳ Time Watched: 0:00 / 3:00</div>
+
+    <!-- Subscription Buttons -->
+    <div class="subscription-buttons">
+      <a class="youtube" href="https://www.youtube.com/channel/UCPglGxl2h81to5-0yMIyVgg" target="_blank">📺 Subscribe YouTube</a>
+      <a class="facebook" href="https://www.facebook.com/MrRealMod" target="_blank">👍 Follow Facebook</a>
+      <a class="telegram" href="https://t.me/MrRealMod" target="_blank">✈️ Join Telegram</a>
+    </div>
 
     <!-- Hidden Unlock Button -->
-    <a id="unlockButton" href="#" target="_blank">Get Password</a>
+    <a id="unlockButton" href="#" target="_blank">🔑 Get Password</a>
 
     <!-- Message -->
     <div id="message"></div>
@@ -125,6 +206,7 @@
     const message = document.getElementById('message');
     const timeDisplay = document.getElementById('timeDisplay');
     const progressBar = document.getElementById('progressBar');
+    const progressLabel = document.getElementById('progressLabel');
     const iframe = document.getElementById('youtubeVideo');
 
     // Parse URL Parameters
@@ -174,7 +256,7 @@
             if (accumulatedWatchTime >= requiredWatchTime) {
               clearInterval(trackingInterval);
               unlockButton.style.display = 'inline-block';
-              message.innerText = "You've watched enough! The link is now unlocked.";
+              message.innerText = "🎉 You've watched enough! The link is now unlocked.";
             }
           }
         }, 1000);
@@ -192,10 +274,11 @@
       const totalMinutes = Math.floor(requiredWatchTime / 60);
       const totalSeconds = requiredWatchTime % 60;
 
-      timeDisplay.innerText = `Time Watched: ${minutesWatched}:${secondsWatched < 10 ? '0' : ''}${secondsWatched} / ${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
+      timeDisplay.innerText = `⏳ Time Watched: ${minutesWatched}:${secondsWatched < 10 ? '0' : ''}${secondsWatched} / ${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
 
       const progress = (accumulatedWatchTime / requiredWatchTime) * 100;
       progressBar.style.width = `${progress}%`;
+      progressLabel.innerText = `${Math.floor(progress)}%`;
     }
   </script>
 </body>
