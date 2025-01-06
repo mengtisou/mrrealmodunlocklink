@@ -118,6 +118,7 @@
       text-decoration: none;
       margin-top: 20px;
       transition: background 0.3s ease-in-out, transform 0.2s;
+      animation: pulse 1.5s infinite;
     }
 
     #unlockButton:hover {
@@ -134,6 +135,21 @@
     #timeDisplay {
       font-size: 14px;
       color: #666;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+      }
     }
 
     @media (max-width: 768px) {
@@ -285,6 +301,7 @@
             if (accumulatedWatchTime >= requiredWatchTime) {
               clearInterval(trackingInterval);
               unlockButton.style.display = 'inline-block';
+              unlockButton.scrollIntoView({ behavior: 'smooth' });
               message.innerText = "🎉 You've watched enough! The link is now unlocked.";
             }
           }
